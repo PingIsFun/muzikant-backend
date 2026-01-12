@@ -1,4 +1,4 @@
-package com.example.spotifyhost.util;
+package io.github.pingisfun.muzikant.util;
 
 public final class SpotifyUrlParser {
   private SpotifyUrlParser() {}

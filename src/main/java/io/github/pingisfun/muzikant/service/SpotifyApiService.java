@@ -1,6 +1,6 @@
-package com.example.spotifyhost.service;
+package io.github.pingisfun.muzikant.service;
 
-import com.example.spotifyhost.model.TrackDto;
+import io.github.pingisfun.muzikant.model.TrackDto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.Comparator;

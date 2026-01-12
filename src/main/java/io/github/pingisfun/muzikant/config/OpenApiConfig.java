@@ -1,4 +1,4 @@
-package com.example.spotifyhost.config;
+package io.github.pingisfun.muzikant.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -11,8 +11,8 @@ public class OpenApiConfig {
   public OpenAPI spotifyHostOpenApi() {
     return new OpenAPI()
       .info(new Info()
-        .title("Spotify Host Backend API")
-        .description("Host-only backend for fetching Spotify playlist tracks.")
+        .title("Muzikant-backend API")
+        .description("Muzikant backend for fetching Spotify playlist tracks.")
         .version("1.0.0"));
   }
 }

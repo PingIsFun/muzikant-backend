@@ -1,7 +1,7 @@
-package com.example.spotifyhost.controller;
+package io.github.pingisfun.muzikant.controller;
 
-import com.example.spotifyhost.service.SpotifyAuthService;
-import com.example.spotifyhost.service.SpotifyTokenResponse;
+import io.github.pingisfun.muzikant.service.SpotifyAuthService;
+import io.github.pingisfun.muzikant.service.SpotifyTokenResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;

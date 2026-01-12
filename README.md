@@ -1,4 +1,4 @@
-# Spotify Host Backend
+# Muzikant-backend
 
 Spring Boot 3 / Java 21 backend that uses a single host Spotify account and exposes `POST /api/playlist`.
 

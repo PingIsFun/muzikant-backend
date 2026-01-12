@@ -3,10 +3,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.example</groupId>
-  <artifactId>spotifyhost</artifactId>
+  <artifactId>muzikant-backend</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>spotifyhost</name>
-  <description>Spotify host-only backend</description>
+  <name>muzikant-backend</name>
+  <description>Muzikant backend</description>
 
   <parent>
     <groupId>org.springframework.boot</groupId>

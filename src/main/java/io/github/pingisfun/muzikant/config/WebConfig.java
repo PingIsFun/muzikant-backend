@@ -1,4 +1,4 @@
-package com.example.spotifyhost.config;
+package io.github.pingisfun.muzikant.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;

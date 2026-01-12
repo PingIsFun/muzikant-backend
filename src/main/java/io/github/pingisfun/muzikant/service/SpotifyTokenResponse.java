@@ -1,4 +1,4 @@
-package com.example.spotifyhost.service;
+package io.github.pingisfun.muzikant.service;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

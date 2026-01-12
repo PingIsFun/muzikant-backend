@@ -1,4 +1,4 @@
-package com.example.spotifyhost.model;
+package io.github.pingisfun.muzikant.model;
 
 public class TrackDto {
   private String id;

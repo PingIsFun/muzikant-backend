@@ -1,9 +1,9 @@
-package com.example.spotifyhost.controller;
+package io.github.pingisfun.muzikant.controller;
 
-import com.example.spotifyhost.model.PlaylistRequest;
-import com.example.spotifyhost.model.TrackDto;
-import com.example.spotifyhost.service.SpotifyApiService;
-import com.example.spotifyhost.util.SpotifyUrlParser;
+import io.github.pingisfun.muzikant.model.PlaylistRequest;
+import io.github.pingisfun.muzikant.model.TrackDto;
+import io.github.pingisfun.muzikant.service.SpotifyApiService;
+import io.github.pingisfun.muzikant.util.SpotifyUrlParser;
 import java.util.List;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
