@@ -11,6 +11,7 @@ SPOTIFY_CLIENT_ID=your_client_id
 SPOTIFY_CLIENT_SECRET=your_client_secret
 SPOTIFY_REDIRECT_URI=http://127.0.0.1:8080/oauth/callback
 SPOTIFY_REFRESH_TOKEN=
+SPOTIFY_OAUTH_ENABLED=false
 FRONTEND_ORIGIN=http://localhost:3000
 ```
 

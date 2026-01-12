@@ -7,10 +7,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@ConditionalOnProperty(
+  name = "spotify.oauth.enabled",
+  havingValue = "true",
+  matchIfMissing = false
+)
 @RestController
 public class OAuthController {
   private static final Logger log = LoggerFactory.getLogger(OAuthController.class);
@@ -21,6 +27,7 @@ public class OAuthController {
     this.authService = authService;
   }
 
+  // OAuth flows are intentionally disabled in production. This backend operates using a single pre-authorized Spotify account via refresh token.
   @GetMapping("/oauth/login")
   public ResponseEntity<Void> login() {
     String url = authService.buildLoginUrl();
