@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
   private final String frontendOrigin;
 
-  public WebConfig(@Value("${FRONTEND_ORIGIN:http://localhost:3000}") String frontendOrigin) {
+  public WebConfig(@Value("${FRONTEND_ORIGIN}") String frontendOrigin) {
     this.frontendOrigin = frontendOrigin;
   }
 
@@ -17,7 +17,7 @@ public class WebConfig implements WebMvcConfigurer {
   public void addCorsMappings(CorsRegistry registry) {
     registry.addMapping("/api/**")
       .allowedOrigins(frontendOrigin)
-      .allowedMethods("POST", "OPTIONS")
+      .allowedMethods("GET")
       .allowedHeaders("*");
   }
 }
