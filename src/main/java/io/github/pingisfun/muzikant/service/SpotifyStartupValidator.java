@@ -31,7 +31,7 @@ public class SpotifyStartupValidator implements ApplicationRunner {
     log.info("Spotify OAuth endpoints disabled. Using refresh token authentication only.");
     String refreshToken = tokenService.getRefreshToken();
     if (refreshToken == null || refreshToken.isBlank()) {
-      throw new IllegalStateException("SPOTIFY_REFRESH_TOKEN is required when OAuth is disabled.");
+      throw new IllegalStateException("spotify.refresh.token is required when OAuth is disabled.");
     }
     tokenService.getValidAccessToken();
   }

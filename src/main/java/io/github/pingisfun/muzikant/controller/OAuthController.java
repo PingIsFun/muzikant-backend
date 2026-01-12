@@ -46,7 +46,7 @@ public class OAuthController {
     }
     SpotifyTokenResponse tokenResponse = authService.exchangeCodeForToken(code);
     if (tokenResponse.getRefreshToken() != null && !tokenResponse.getRefreshToken().isBlank()) {
-      log.info("Spotify refresh token obtained. Save this value to SPOTIFY_REFRESH_TOKEN: {}", tokenResponse.getRefreshToken());
+      log.info("Spotify refresh token obtained. Save this value to spotify.refresh.token: {}", tokenResponse.getRefreshToken());
     }
     return ResponseEntity.ok("Spotify account linked successfully. You may close this window.");
   }

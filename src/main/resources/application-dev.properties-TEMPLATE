@@ -1,0 +1,7 @@
+app.spotify.client.id=<client_id>
+app.spotify.client.secret=<client_secret>
+app.spotify.redirect.uri=http://127.0.0.1:8080/oauth/callback
+app.spotify.refresh.token=<refresh_token>
+app.spotify.oauth.enabled=false
+app.spotify.max.concurrent.calls=1
+app.frontend.origin=http://127.0.0.1:5173

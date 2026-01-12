@@ -13,6 +13,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -35,7 +36,7 @@ public class SpotifyApiService {
   public SpotifyApiService(
     RestTemplate restTemplate,
     SpotifyTokenService tokenService,
-    @org.springframework.beans.factory.annotation.Value("${spotify.max.concurrent.calls:1}") int maxConcurrentCalls
+    @Value("${spotify.max.concurrent.calls:1}") int maxConcurrentCalls
   ) {
     this.restTemplate = restTemplate;
     this.tokenService = tokenService;
@@ -62,13 +63,18 @@ public class SpotifyApiService {
           continue;
         }
         if (seen.add(item.track.id)) {
-          String artist = "";
+          StringBuilder artistBuilder = new StringBuilder();
           if (item.track.artists != null && !item.track.artists.isEmpty()) {
-            artist = item.track.artists.get(0).name;
+              for (SpotifyArtist art: item.track.artists) {
+                  artistBuilder.append(art.name).append(", ");
+              }
+          }
+          if (!artistBuilder.isEmpty()) {
+              artistBuilder.delete(artistBuilder.length() - 2, artistBuilder.length());
           }
           Integer year = extractYear(item.track.album != null ? item.track.album.releaseDate : null);
           String spotifyUrl = item.track.externalUrls != null ? item.track.externalUrls.spotify : null;
-          results.add(new TrackDto(item.track.id, item.track.name, artist, year, spotifyUrl));
+          results.add(new TrackDto(item.track.id, item.track.name, artistBuilder.toString(), year, spotifyUrl));
         }
       }
       if (response.next == null || response.next.isBlank()) {

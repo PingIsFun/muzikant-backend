@@ -28,9 +28,9 @@ public class SpotifyAuthService {
   public SpotifyAuthService(
     RestTemplate restTemplate,
     SpotifyTokenService tokenService,
-    @Value("${SPOTIFY_CLIENT_ID}") String clientId,
-    @Value("${SPOTIFY_CLIENT_SECRET}") String clientSecret,
-    @Value("${SPOTIFY_REDIRECT_URI}") String redirectUri
+    @Value("${spotify.client.id}") String clientId,
+    @Value("${spotify.client.secret}") String clientSecret,
+    @Value("${spotify.redirect.uri}") String redirectUri
   ) {
     this.restTemplate = restTemplate;
     this.tokenService = tokenService;

@@ -24,9 +24,9 @@ public class SpotifyTokenService {
 
   public SpotifyTokenService(
     RestTemplate restTemplate,
-    @Value("${SPOTIFY_CLIENT_ID}") String clientId,
-    @Value("${SPOTIFY_CLIENT_SECRET}") String clientSecret,
-    @Value("${SPOTIFY_REFRESH_TOKEN:}") String refreshToken
+    @Value("${spotify.client.id}") String clientId,
+    @Value("${spotify.client.secret}") String clientSecret,
+    @Value("${spotify.refresh.token:}") String refreshToken
   ) {
     this.restTemplate = restTemplate;
     this.clientId = clientId;
@@ -46,7 +46,7 @@ public class SpotifyTokenService {
 
   public synchronized String getValidAccessToken() {
     if (refreshToken == null || refreshToken.isBlank()) {
-      throw new IllegalStateException("SPOTIFY_REFRESH_TOKEN is not set. Complete /oauth/login first.");
+      throw new IllegalStateException("spotify.refresh.token is not set. Complete /oauth/login first.");
     }
     if (accessToken == null || expiresAt == null || Instant.now().isAfter(expiresAt.minusSeconds(60))) {
       refreshAccessToken();

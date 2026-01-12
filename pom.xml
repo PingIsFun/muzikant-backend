@@ -39,4 +39,23 @@
       </plugin>
     </plugins>
   </build>
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <activatedSpringBootProfile>dev</activatedSpringBootProfile>
+            </properties>
+
+            <!-- if we don't specify the profile, this one is activated by default -->
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <activatedSpringBootProfile>prod</activatedSpringBootProfile>
+            </properties>
+        </profile>
+    </profiles>
 </project>

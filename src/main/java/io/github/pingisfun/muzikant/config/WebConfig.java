@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
   private final String frontendOrigin;
 
-  public WebConfig(@Value("${FRONTEND_ORIGIN}") String frontendOrigin) {
+  public WebConfig(@Value("${frontend.origin}") String frontendOrigin) {
     this.frontendOrigin = frontendOrigin;
   }
 
