@@ -54,6 +54,7 @@ public class SpotifyApiService {
   public PlaylistResponse fetchPlaylist(String playlistId) {
     Instant started = Instant.now();
     AtomicInteger requestCount = new AtomicInteger(0);
+    log.info("Spotify playlist fetch start. playlistId={}", playlistId);
     List<TrackDto> results = new ArrayList<>();
     Set<String> seen = new HashSet<>();
 
@@ -78,11 +79,15 @@ public class SpotifyApiService {
     }
 
     results.sort(Comparator.comparing(TrackDto::getYear, Comparator.nullsLast(Integer::compareTo)));
+    long durationMs = Duration.between(started, Instant.now()).toMillis();
+    int totalRequests = Math.max(requestCount.get(), 1);
+    long averageRequestMs = durationMs / totalRequests;
     log.info(
-      "Spotify playlist fetch complete. playlistId={}, requests={}, durationMs={}",
+      "Spotify playlist fetch complete. playlistId={}, requests={}, durationMs={}, avgRequestMs={}",
       playlistId,
-      requestCount.get(),
-      Duration.between(started, Instant.now()).toMillis()
+      totalRequests,
+      durationMs,
+      averageRequestMs
     );
     return new PlaylistResponse(playlistName, results);
   }
