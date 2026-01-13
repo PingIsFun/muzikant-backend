@@ -13,6 +13,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -51,6 +52,8 @@ public class SpotifyApiService {
   }
 
   public PlaylistResponse fetchPlaylist(String playlistId) {
+    Instant started = Instant.now();
+    AtomicInteger requestCount = new AtomicInteger(0);
     List<TrackDto> results = new ArrayList<>();
     Set<String> seen = new HashSet<>();
 
@@ -66,7 +69,7 @@ public class SpotifyApiService {
       .toUriString();
 
     while (nextUrl != null && !nextUrl.isBlank()) {
-      PlaylistTracksResponse page = get(nextUrl, PlaylistTracksResponse.class);
+      PlaylistTracksResponse page = getWithCount(nextUrl, PlaylistTracksResponse.class, requestCount);
       if (page == null || page.items == null) {
         break;
       }
@@ -75,6 +78,12 @@ public class SpotifyApiService {
     }
 
     results.sort(Comparator.comparing(TrackDto::getYear, Comparator.nullsLast(Integer::compareTo)));
+    log.info(
+      "Spotify playlist fetch complete. playlistId={}, requests={}, durationMs={}",
+      playlistId,
+      requestCount.get(),
+      Duration.between(started, Instant.now()).toMillis()
+    );
     return new PlaylistResponse(playlistName, results);
   }
 
@@ -87,6 +96,11 @@ public class SpotifyApiService {
       .toUriString();
     PlaylistNameResponse response = get(url, PlaylistNameResponse.class);
     return response != null ? response.name : null;
+  }
+
+  private <T> T getWithCount(String url, Class<T> responseType, AtomicInteger counter) {
+    counter.incrementAndGet();
+    return get(url, responseType);
   }
 
   private <T> T get(String url, Class<T> responseType) {
@@ -109,7 +123,7 @@ public class SpotifyApiService {
     long retryUntil = retryAfterEpochMs.get();
     if (now < retryUntil) {
       long waitMs = retryUntil - now;
-      log.info("Waiting {} ms before Spotify request (rate limited until {}).", waitMs, Instant.ofEpochMilli(retryUntil));
+      log.warn("Waiting {} ms before Spotify request (rate limited until {}).", waitMs, Instant.ofEpochMilli(retryUntil));
       sleepMillis(waitMs);
     }
   }
@@ -132,13 +146,10 @@ public class SpotifyApiService {
   }
 
   private <T> T doGet(String url, Class<T> responseType) {
-    Instant start = Instant.now();
-    log.info("Spotify request start: {}", url);
     HttpHeaders headers = new HttpHeaders();
     headers.setBearerAuth(tokenService.getValidAccessToken());
     HttpEntity<Void> entity = new HttpEntity<>(headers);
     ResponseEntity<T> response = restTemplate.exchange(url, HttpMethod.GET, entity, responseType);
-    log.info("Spotify request finished in {} ms: {}", Duration.between(start, Instant.now()).toMillis(), url);
     return response.getBody();
   }
 
