@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.pingisfun.muzikant.model.PlaylistResponse;
 import io.github.pingisfun.muzikant.model.TrackDto;
 import java.time.Instant;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -108,7 +109,7 @@ public class SpotifyApiService {
     long retryUntil = retryAfterEpochMs.get();
     if (now < retryUntil) {
       long waitMs = retryUntil - now;
-      log.info("Waiting {} ms before Spotify request.", waitMs);
+      log.info("Waiting {} ms before Spotify request (rate limited until {}).", waitMs, Instant.ofEpochMilli(retryUntil));
       sleepMillis(waitMs);
     }
   }
@@ -131,10 +132,13 @@ public class SpotifyApiService {
   }
 
   private <T> T doGet(String url, Class<T> responseType) {
+    Instant start = Instant.now();
+    log.info("Spotify request start: {}", url);
     HttpHeaders headers = new HttpHeaders();
     headers.setBearerAuth(tokenService.getValidAccessToken());
     HttpEntity<Void> entity = new HttpEntity<>(headers);
     ResponseEntity<T> response = restTemplate.exchange(url, HttpMethod.GET, entity, responseType);
+    log.info("Spotify request finished in {} ms: {}", Duration.between(start, Instant.now()).toMillis(), url);
     return response.getBody();
   }
 
