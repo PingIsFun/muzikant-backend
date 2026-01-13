@@ -6,10 +6,8 @@ on:
       - master
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    environment: deploy
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -26,6 +24,22 @@ jobs:
       - name: Rename JAR for deployment
         run: mv target/*.jar target/muzikant-backend.jar
 
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: muzikant-backend-jar
+          path: target/muzikant-backend.jar
+
+  deploy:
+    runs-on: ubuntu-latest
+    environment: deploy
+    needs: build
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: muzikant-backend-jar
+
       - name: Copy JAR to server
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -33,9 +47,9 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          source: target/muzikant-backend.jar
+          source: muzikant-backend.jar
           target: /opt/muzikant-backend
-          strip_components: 1
+          strip_components: 0
 
       - name: Restart application on server
         uses: appleboy/ssh-action@v1.0.3
