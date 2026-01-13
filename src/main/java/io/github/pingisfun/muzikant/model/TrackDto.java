@@ -4,15 +4,17 @@ public class TrackDto {
   private String id;
   private String title;
   private String artist;
+  private String album;
   private Integer year;
   private String spotifyUrl;
 
   public TrackDto() {}
 
-  public TrackDto(String id, String title, String artist, Integer year, String spotifyUrl) {
+  public TrackDto(String id, String title, String artist, String album, Integer year, String spotifyUrl) {
     this.id = id;
     this.title = title;
     this.artist = artist;
+    this.album = album;
     this.year = year;
     this.spotifyUrl = spotifyUrl;
   }
@@ -39,6 +41,14 @@ public class TrackDto {
 
   public void setArtist(String artist) {
     this.artist = artist;
+  }
+
+  public String getAlbum() {
+    return album;
+  }
+
+  public void setAlbum(String album) {
+    this.album = album;
   }
 
   public Integer getYear() {

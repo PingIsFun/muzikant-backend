@@ -3,6 +3,7 @@ package io.github.pingisfun.muzikant.service;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.pingisfun.muzikant.model.TrackDto;
 import java.time.Instant;
+import io.github.pingisfun.muzikant.model.PlaylistResponse;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -21,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 public class SpotifyApiService {
@@ -43,48 +45,34 @@ public class SpotifyApiService {
     this.spotifySemaphore = new Semaphore(Math.max(1, maxConcurrentCalls));
   }
 
-  public List<TrackDto> fetchPlaylistTracks(String playlistId) {
+  public PlaylistResponse fetchPlaylist(String playlistId) {
     List<TrackDto> results = new ArrayList<>();
     Set<String> seen = new HashSet<>();
-    int offset = 0;
-    int limit = 100;
 
-    while (true) {
-      String url = "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks?limit=" + limit + "&offset=" + offset;
-      PlaylistTracksResponse response = get(url, PlaylistTracksResponse.class);
-      if (response == null || response.items == null) {
+    String url = UriComponentsBuilder
+      .fromHttpUrl("https://api.spotify.com/v1/playlists/" + playlistId)
+      .queryParam("fields", "name,tracks.items(track(id,name,artists(name),album(name,release_date),external_urls(spotify))),tracks.next")
+      .build()
+      .encode()
+      .toUriString();
+    PlaylistResponsePayload response = get(url, PlaylistResponsePayload.class);
+    if (response != null && response.tracks != null) {
+      addTracks(results, seen, response.tracks.items);
+    }
+
+    String nextUrl = response != null && response.tracks != null ? response.tracks.next : null;
+    while (nextUrl != null && !nextUrl.isBlank()) {
+      PlaylistTracksResponse page = get(nextUrl, PlaylistTracksResponse.class);
+      if (page == null || page.items == null) {
         break;
       }
-      for (PlaylistTrackItem item : response.items) {
-        if (item == null || item.track == null || item.isLocal) {
-          continue;
-        }
-        if (item.track.id == null || item.track.id.isBlank()) {
-          continue;
-        }
-        if (seen.add(item.track.id)) {
-          StringBuilder artistBuilder = new StringBuilder();
-          if (item.track.artists != null && !item.track.artists.isEmpty()) {
-              for (SpotifyArtist art: item.track.artists) {
-                  artistBuilder.append(art.name).append(", ");
-              }
-          }
-          if (!artistBuilder.isEmpty()) {
-              artistBuilder.delete(artistBuilder.length() - 2, artistBuilder.length());
-          }
-          Integer year = extractYear(item.track.album != null ? item.track.album.releaseDate : null);
-          String spotifyUrl = item.track.externalUrls != null ? item.track.externalUrls.spotify : null;
-          results.add(new TrackDto(item.track.id, item.track.name, artistBuilder.toString(), year, spotifyUrl));
-        }
-      }
-      if (response.next == null || response.next.isBlank()) {
-        break;
-      }
-      offset += limit;
+      addTracks(results, seen, page.items);
+      nextUrl = page.next;
     }
 
     results.sort(Comparator.comparing(TrackDto::getYear, Comparator.nullsLast(Integer::compareTo)));
-    return results;
+    String playlistName = response != null ? response.name : null;
+    return new PlaylistResponse(playlistName, results);
   }
 
   private <T> T get(String url, Class<T> responseType) {
@@ -158,6 +146,35 @@ public class SpotifyApiService {
     }
   }
 
+  private void addTracks(List<TrackDto> results, Set<String> seen, List<PlaylistTrackItem> items) {
+    if (items == null) {
+      return;
+    }
+    for (PlaylistTrackItem item : items) {
+      if (item == null || item.track == null || item.isLocal) {
+        continue;
+      }
+      if (item.track.id == null || item.track.id.isBlank()) {
+        continue;
+      }
+      if (seen.add(item.track.id)) {
+        StringBuilder artistBuilder = new StringBuilder();
+        if (item.track.artists != null && !item.track.artists.isEmpty()) {
+          for (SpotifyArtist art : item.track.artists) {
+            artistBuilder.append(art.name).append(", ");
+          }
+        }
+        if (!artistBuilder.isEmpty()) {
+          artistBuilder.delete(artistBuilder.length() - 2, artistBuilder.length());
+        }
+        String album = item.track.album != null ? item.track.album.name : null;
+        Integer year = extractYear(item.track.album != null ? item.track.album.releaseDate : null);
+        String spotifyUrl = item.track.externalUrls != null ? item.track.externalUrls.spotify : null;
+        results.add(new TrackDto(item.track.id, item.track.name, artistBuilder.toString(), album, year, spotifyUrl));
+      }
+    }
+  }
+
   private Integer extractYear(String releaseDate) {
     if (releaseDate == null || releaseDate.isBlank()) {
       return null;
@@ -194,6 +211,7 @@ public class SpotifyApiService {
   }
 
   private static class SpotifyAlbum {
+    public String name;
     @JsonProperty("release_date")
     public String releaseDate;
   }
@@ -206,5 +224,9 @@ public class SpotifyApiService {
     public String spotify;
   }
 
+  private static class PlaylistResponsePayload {
+    public String name;
+    public PlaylistTracksResponse tracks;
+  }
 
 }
